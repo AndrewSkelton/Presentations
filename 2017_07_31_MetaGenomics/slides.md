@@ -211,7 +211,7 @@ for(i in variables.in) {
 * Well, 1 Result.
 * Micrococcus luteus (raw p value 0.08 - Not great, 1.55 FC)
 * Convinced?
-*
+
 <img src='img/Kraken_Result.png' height=300>
 
 #
