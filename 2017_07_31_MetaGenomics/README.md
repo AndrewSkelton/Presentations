@@ -1,2 +1,2 @@
-# git-tutorial
-A tutorial (slides, code) for Git and Github for Scientists
+# Reveal.js Presentation for SRG Seminar
+Slides / Presentation for preliminary work on metagenomic assessment of RNA Seq reads. 
