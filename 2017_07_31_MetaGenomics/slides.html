@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Andrew Skelton">
+  <title>Metagenomics in RNA Seq</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/solarized.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+  <h1 class="title">Metagenomics in RNA Seq</h1>
+  <p class="author">Andrew Skelton</p>
+  <p class="date">2nd August 2017</p>
+</section>
+
+<section id="section" class="level1">
+<h1></h1>
+<section id="what-exactly-are-you-doing" class="level2">
+<h2>What exactly are you doing?</h2>
+<ul>
+<li>&quot;Wouldn't it be interesting if...&quot; - David</li>
+<li>&quot;Wouldn't it be cool if...&quot; - Louise</li>
+<li>Hypothesis: Is there a difference in contamination between NOF and OA RNA Seq samples?</li>
+<li>Broad hypothesis, but presents some interesting challenges.</li>
+</ul>
+</section>
+</section>
+<section id="section-1" class="level1">
+<h1></h1>
+<section id="im-with-you-so-far...-what-challenges" class="level2">
+<h2>I'm with you so far... What challenges?</h2>
+<ul>
+<li>What to quantify?</li>
+<li>How to quantify it?</li>
+<li>What database could we use? ... is there a database?</li>
+</ul>
+</section>
+</section>
+<section id="section-2" class="level1">
+<h1></h1>
+<section id="lets-start-with-data-whats-the-input" class="level2">
+<h2>Lets start with data, what's the input?</h2>
+<ul>
+<li>Fastq files - (raw sequencer reads with quality scores)</li>
+<li>First Pass: Unmapped reads from a 2-pass STAR alignment</li>
+<li>(to do) Second Pass: Mapped reads</li>
+</ul>
+</section>
+</section>
+<section id="quality-control" class="level1">
+<h1>Quality Control</h1>
+<section id="process" class="level2">
+<h2>Process</h2>
+<ul>
+<li>fastqc on each sample</li>
+<li>MultiQC for experiment wide context</li>
+<li>Trimmomatic for cleaning up data</li>
+</ul>
+</section>
+<section id="trimming" class="level2">
+<h2>Trimming</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+<span class="kw">for</span> <span class="ex">i</span> in ../raw_data/*R1*<span class="kw">;</span> <span class="kw">do</span>
+    <span class="va">filename=$(</span><span class="fu">basename</span> <span class="st">&quot;</span><span class="va">$i</span><span class="st">&quot;</span><span class="va">)</span>
+    <span class="va">filename=</span><span class="st">&quot;</span><span class="va">${filename%</span>.*<span class="va">}</span><span class="st">&quot;</span>
+    <span class="va">filename=</span><span class="st">&quot;</span><span class="va">${filename%</span>.*<span class="va">}</span><span class="st">&quot;</span>
+    <span class="va">filename=</span><span class="st">&quot;</span><span class="va">${filename%</span>.*<span class="va">}</span><span class="st">&quot;</span>
+
+    <span class="ex">trim_galore</span> --paired --illumina --phred64 -o ../trimming/ \
+                            ../raw_data/<span class="va">${filename}</span>.R1.fastq.gz \
+                            ../raw_data/<span class="va">${filename}</span>.R2.fastq.gz <span class="kw">&amp;</span>
+<span class="kw">done</span></code></pre></div>
+</section>
+<section id="fastqc-multiqc" class="level2">
+<h2>Fastqc + Multiqc</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">for</span> <span class="ex">i</span> in ../trimming/*.fq.gz<span class="kw">;</span> <span class="kw">do</span>
+  <span class="ex">fastqc</span> -o ../fastqc/trimmed <span class="va">${i}</span> <span class="kw">&amp;</span>
+<span class="kw">done</span>
+<span class="bu">wait</span>
+<span class="ex">multiqc</span> ../fastqc/trimmed/</code></pre></div>
+</section>
+<section id="how-many-reads-left" class="level2">
+<h2>How many reads left?</h2>
+<ul>
+<li>Between 1 and 3 million paired reads per sample</li>
+<li>15%-20% of sequence duplication per sample</li>
+<li>GC average ~56%</li>
+<li>Length average 55-60 bases</li>
+</ul>
+</section>
+<section id="gc-distribution" class="level2">
+<h2>GC Distribution</h2>
+<p><img src='img/gc.png' height=350></p>
+</section>
+</section>
+<section id="section-3" class="level1">
+<h1></h1>
+<section id="we-have-data-now-what" class="level2">
+<h2>We have data, now what?</h2>
+<ul>
+<li>Quantification, and something to quantify against.</li>
+<li>There are a few potential methods</li>
+<li>2 birds, one stone - Kraken.</li>
+</ul>
+</section>
+</section>
+<section id="section-4" class="level1">
+<h1></h1>
+<section id="whats-kraken" class="level2">
+<h2>What's Kraken?</h2>
+<p><img src='img/kraken.jpg' height=450></p>
+</section>
+<section id="kraken-in-a-nutshell" class="level2">
+<h2>Kraken in a nutshell</h2>
+<ul>
+<li>Assigns Taxonomic labels to short DNA sequences (RNA compatible)</li>
+<li>Designed for metagenomic reads</li>
+<li>Really Really quick (1,441,476 Reads/Min)</li>
+<li>Comes with a pre-built database (~4GB)</li>
+<li>Containing Bacterial, Archaeal, and Viral Genomes</li>
+<li>Build - Refseq 2014</li>
+<li>Outputs in MPA format</li>
+</ul>
+</section>
+<section id="code---running-kraken" class="level2">
+<h2>Code - Running Kraken</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># Variables</span>
+<span class="va">KRAKEN=</span>/home/andrew/2016May_RNASeq_David/Alignment_STAR/Unmapped/kraken/kraken_install/kraken
+<span class="va">KRAKEN_T=</span>/home/andrew/2016May_RNASeq_David/Alignment_STAR/Unmapped/kraken/kraken_install/kraken-translate
+<span class="va">KRAKEN_DB=</span>/home/andrew/2016May_RNASeq_David/Alignment_STAR/Unmapped/kraken/minikraken_20141208
+<span class="va">INDIR=</span>/home/andrew/2016May_RNASeq_David/Alignment_STAR/Unmapped/trimming
+<span class="va">OUTDIR=</span>/home/andrew/2016May_RNASeq_David/Alignment_STAR/Unmapped/kraken/kraken_out/
+
+<span class="co"># Loop through forward read files</span>
+<span class="kw">for</span> <span class="ex">i</span> in ../trimming/*R1*.gz<span class="kw">;</span> <span class="kw">do</span>
+  <span class="co"># Get sample name</span>
+    <span class="va">filename=$(</span><span class="fu">basename</span> <span class="st">&quot;</span><span class="va">$i</span><span class="st">&quot;</span><span class="va">)</span>
+    <span class="va">filename=</span><span class="st">&quot;</span><span class="va">${filename%</span>.*<span class="va">}</span><span class="st">&quot;</span>
+    <span class="va">filename=</span><span class="st">&quot;</span><span class="va">${filename%</span>.*<span class="va">}</span><span class="st">&quot;</span>
+    <span class="va">filename=</span><span class="st">&quot;</span><span class="va">${filename%</span>.*<span class="va">}</span><span class="st">&quot;</span>
+
+  <span class="co"># Run Kraken</span>
+    <span class="va">$KRAKEN</span> <span class="ex">--db</span> <span class="va">$KRAKEN_DB</span> --threads 10 --fastq-input --gzip-compressed --quick \
+                    --output <span class="va">${OUTDIR}</span>/<span class="va">${filename}</span>.kraken \
+                    --paired <span class="va">${INDIR}</span>/<span class="va">${filename}</span>.R1_val_1.fq.gz \
+                                 <span class="va">${INDIR}</span>/<span class="va">${filename}</span>.R2_val_2.fq.gz
+
+  <span class="co"># Get Classified Entries</span>
+    <span class="fu">grep</span> <span class="st">&quot;^C&quot;</span> <span class="va">${OUTDIR}</span>/<span class="va">${filename}</span>.kraken <span class="op">&gt;</span> <span class="va">${OUTDIR}</span>/<span class="va">${filename}</span>.classified.kraken
+
+  <span class="co"># Annotate records with taxa info</span>
+    <span class="va">$KRAKEN_T</span> <span class="ex">--mpa-format</span> \
+            --db <span class="va">$KRAKEN_DB</span> <span class="va">${OUTDIR}</span>/<span class="va">${filename}</span>.classified.kraken <span class="op">&gt;</span> \
+            <span class="va">${OUTDIR}</span>/<span class="va">${filename}</span>.classified.kraken.mpa
+<span class="kw">done</span></code></pre></div>
+</section>
+<section id="some-numbers" class="level2">
+<h2>Some Numbers</h2>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Reads</th>
+<th style="text-align: center;">Classified</th>
+<th style="text-align: center;">Proportion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1,162,956</td>
+<td style="text-align: center;">9659</td>
+<td style="text-align: center;">0.83%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1,193,058</td>
+<td style="text-align: center;">10482</td>
+<td style="text-align: center;">0.88%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1,797,999</td>
+<td style="text-align: center;">11326</td>
+<td style="text-align: center;">0.63%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1,686,084</td>
+<td style="text-align: center;">10406</td>
+<td style="text-align: center;">0.62%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1,475,108</td>
+<td style="text-align: center;">11674</td>
+<td style="text-align: center;">0.79%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1,146,232</td>
+<td style="text-align: center;">12124</td>
+<td style="text-align: center;">1.06%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1,231,947</td>
+<td style="text-align: center;">14295</td>
+<td style="text-align: center;">1.16%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1,061,730</td>
+<td style="text-align: center;">17620</td>
+<td style="text-align: center;">1.66%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1,314,030</td>
+<td style="text-align: center;">11385</td>
+<td style="text-align: center;">0.87%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1,740,879</td>
+<td style="text-align: center;">17101</td>
+<td style="text-align: center;">0.98%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1,895,157</td>
+<td style="text-align: center;">13527</td>
+<td style="text-align: center;">0.71%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2,780,420</td>
+<td style="text-align: center;">15333</td>
+<td style="text-align: center;">0.55%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1,647,065</td>
+<td style="text-align: center;">13347</td>
+<td style="text-align: center;">0.81%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1,679,619</td>
+<td style="text-align: center;">12112</td>
+<td style="text-align: center;">0.72%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1,309,555</td>
+<td style="text-align: center;">14893</td>
+<td style="text-align: center;">1.14%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">978,411</td>
+<td style="text-align: center;">12996</td>
+<td style="text-align: center;">1.33%</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="section-5" class="level1">
+<h1></h1>
+<section id="kraken-results" class="level2">
+<h2>Kraken Results</h2>
+<ul>
+<li>How to quantify?</li>
+<li>How to analyse?</li>
+<li>Accounting for Taxa level?</li>
+</ul>
+<p><img src='img/genetic_testing_results.png' height=200></p>
+</section>
+<section id="step-1---setting-things-up" class="level2">
+<h2>Step 1 - Setting things up</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pheno           &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(<span class="st">&quot;NOF_OA_Pheno_Table.txt&quot;</span>)
+Kingdom         &lt;-<span class="st"> </span><span class="kw">c</span>(); Phylum &lt;-<span class="st"> </span><span class="kw">c</span>(); Class   &lt;-<span class="st"> </span><span class="kw">c</span>(); Order &lt;-<span class="st"> </span><span class="kw">c</span>();
+Family          &lt;-<span class="st"> </span><span class="kw">c</span>(); Genus  &lt;-<span class="st"> </span><span class="kw">c</span>(); Species &lt;-<span class="st"> </span><span class="kw">c</span>();
+files.in        &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="st">&quot;kraken_out/&quot;</span>, <span class="dt">pattern =</span> <span class="st">&quot;*.mpa&quot;</span>, <span class="dt">full.names =</span> T)
+<span class="kw">names</span>(files.in) &lt;-<span class="st"> </span>files.in <span class="op">%&gt;%</span><span class="st"> </span>basename <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;[.].*$&quot;</span>,<span class="st">&quot;&quot;</span>,.)
+
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(files.in)) {
+  kraken.results      &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(files.in[i], <span class="dt">col_names =</span> F)
+  kraken.list         &lt;-<span class="st"> </span>kraken.results<span class="op">$</span>X2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">strsplit</span>(<span class="dt">split =</span> <span class="st">&quot;|&quot;</span>, <span class="dt">fixed =</span> T)
+  kraken.df           &lt;-<span class="st"> </span>stringi<span class="op">::</span><span class="kw">stri_list2matrix</span>(kraken.list) <span class="op">%&gt;%</span><span class="st"> </span>t <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span>
+<span class="st">                         </span><span class="kw">mutate_all</span>(<span class="kw">funs</span>(<span class="kw">gsub</span>(<span class="st">&quot;^.__&quot;</span>, <span class="st">&quot;&quot;</span>, .)))
+  <span class="kw">colnames</span>(kraken.df) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Kingdom&quot;</span>,<span class="st">&quot;Phylum&quot;</span>,<span class="st">&quot;Class&quot;</span>,<span class="st">&quot;Order&quot;</span>,<span class="st">&quot;Family&quot;</span>,<span class="st">&quot;Genus&quot;</span>,<span class="st">&quot;Species&quot;</span>)
+}</code></pre></div>
+</section>
+<section id="step-2---counting" class="level2">
+<h2>Step 2 - Counting</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">colnames</span>(kraken.df)) {
+  lib.size          &lt;-<span class="st"> </span>kraken.df[[j]] <span class="op">%&gt;%</span><span class="st"> </span>na.omit <span class="op">%&gt;%</span><span class="st"> </span>length
+  tmp.class         &lt;-<span class="st"> </span>kraken.df[[j]] <span class="op">%&gt;%</span><span class="st"> </span>na.omit <span class="op">%&gt;%</span><span class="st"> </span>table <span class="op">%&gt;%</span><span class="st"> </span><span class="co">#{./{lib.size}*100} %&gt;%</span>
+<span class="st">                       </span>as.data.frame <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">setNames</span>(<span class="kw">c</span>(j, <span class="kw">names</span>(files.in)[i]))
+  <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> <span class="kw">paste0</span>(<span class="st">&quot;tmp.master &lt;- &quot;</span>, j)))
+  <span class="cf">if</span>(<span class="kw">is.null</span>(tmp.master)) {
+    tmp.out    &lt;-<span class="st"> </span>tmp.class
+  } <span class="cf">else</span> {
+    tmp.out    &lt;-<span class="st"> </span>tmp.master <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">full_join</span>(tmp.class)
+  }
+  <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> <span class="kw">paste0</span>(j, <span class="st">&quot; &lt;- tmp.out&quot;</span>)))
+}</code></pre></div>
+</section>
+<section id="step-3---an-appropriate-test" class="level2">
+<h2>Step 3 - An Appropriate Test?</h2>
+<ul>
+<li>Left Skew</li>
+<li>Negative-bionomial?</li>
+<li>DESeq2</li>
+</ul>
+</section>
+<section id="step-3---testing" class="level2">
+<h2>Step 3 - Testing</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">variables.in &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Kingdom&quot;</span>,<span class="st">&quot;Phylum&quot;</span>,<span class="st">&quot;Class&quot;</span>,<span class="st">&quot;Order&quot;</span>,<span class="st">&quot;Family&quot;</span>,<span class="st">&quot;Genus&quot;</span>,<span class="st">&quot;Species&quot;</span>)
+<span class="cf">for</span>(i <span class="cf">in</span> variables.in) {
+  <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> <span class="kw">paste0</span>(<span class="st">&quot;tmp.df &lt;- &quot;</span>, i)))
+  tmp.df[<span class="kw">is.na</span>(tmp.df)] &lt;-<span class="st"> </span><span class="dv">0</span>
+  tmp.th       &lt;-<span class="st"> </span>tmp.df <span class="op">%&gt;%</span><span class="st"> </span>unique <span class="op">%&gt;%</span><span class="st"> </span>{<span class="kw">ifelse</span>(<span class="kw">length</span>(.) <span class="op">&lt;</span><span class="st"> </span><span class="dv">10</span>, <span class="kw">length</span>(.), <span class="dv">10</span>)}
+  tmp.df.matr  &lt;-<span class="st"> </span>tmp.df[,<span class="op">-</span><span class="dv">1</span>] <span class="op">%&gt;%</span><span class="st"> </span>as.matrix
+  <span class="kw">rownames</span>(tmp.df.matr) &lt;-<span class="st"> </span>tmp.df[[<span class="dv">1</span>]]
+
+  <span class="cf">if</span>(<span class="kw">nrow</span>(tmp.df.matr) <span class="op">&gt;</span><span class="st"> </span><span class="dv">50</span>) {
+      dds          &lt;-<span class="st"> </span><span class="kw">DESeqDataSetFromMatrix</span>(tmp.df.matr, <span class="dt">colData =</span> pheno, <span class="dt">design =</span> <span class="op">~</span><span class="st"> </span>SampleType)
+      dds          &lt;-<span class="st"> </span><span class="kw">DESeq</span>(dds)
+      res          &lt;-<span class="st"> </span><span class="kw">results</span>(dds) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">add_rownames</span>(<span class="st">&quot;Feature&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">                      </span><span class="kw">filter</span>(pvalue <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.1</span>, baseMean <span class="op">&gt;</span><span class="st"> </span><span class="dv">10</span>, <span class="kw">abs</span>(log2FoldChange) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.6</span> )
+      <span class="cf">if</span>(<span class="kw">nrow</span>(res) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) { <span class="kw">print</span>(res); <span class="kw">print</span>(i) }
+  }
+}</code></pre></div>
+</section>
+<section id="step-4---results" class="level2">
+<h2>Step 4 - Results</h2>
+<ul>
+<li>Finally. Some Results.</li>
+<li>Well, 1 Result.</li>
+<li>Micrococcus luteus (raw p value 0.08 - Not great, 1.55 FC)</li>
+<li>Convinced?</li>
+<li><img src='img/Kraken_Result.png' height=300></li>
+</ul>
+</section>
+</section>
+<section id="section-6" class="level1">
+<h1></h1>
+<section id="thats-not-really-fantastic-can-you-do-better" class="level2">
+<h2>That's not really fantastic, can you do better?</h2>
+<ul>
+<li>Maybe.</li>
+<li>Kraken method similar to Salmon / Kallisto</li>
+<li>Making databases is easier with Salmon than Kallisto / Kraken</li>
+<li>Direct Quantification</li>
+<li>Huge Indexes</li>
+<li>Kraken could be too sensitive, so other methods are worth trying</li>
+<li>QIIME + Phyloseq</li>
+</ul>
+</section>
+</section>
+<section id="section-7" class="level1">
+<h1></h1>
+<section id="questions" class="level2">
+<h2>Questions?</h2>
+</section>
+</section>
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Transition style
+        transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+              { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
