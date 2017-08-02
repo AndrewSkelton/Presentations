@@ -403,6 +403,128 @@ files.in        &lt;-<span class="st"> </span><span class="kw">list.files</span>
 </section>
 <section id="section-7" class="level1">
 <h1></h1>
+<section id="centrifuge" class="level2">
+<h2>Centrifuge</h2>
+<ul>
+<li>Classifier for metagenomic sequences</li>
+<li>Available on Github / Johns Hopkins Website</li>
+<li>Well build software, published late 2016</li>
+<li>Recently compiled (mid-2016) databases of:</li>
+<li>Bacteria, Archaea (4.4GB)</li>
+<li>Bacteria, Archaea, Viruses, Human (5.4GB)</li>
+<li>nt (50GB)</li>
+</ul>
+</section>
+<section id="code" class="level2">
+<h2>Code</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">centrifuge</span> -q --phred64 -p 8 --seed 73 \
+                     -S Flowcell_A_1.centrifuge.out \
+                     -x Index/p+h+v/p+h+v \
+                     -1 data_in/Flowcell_A_1.unmapped.R1_val_1.fq.gz \
+                     -2 data_in/Flowcell_A_1.unmapped.R2_val_2.fq.gz</code></pre></div>
+</section>
+<section id="output-table" class="level2">
+<h2>Output Table</h2>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: right;">taxI</th>
+<th>D ta</th>
+<th>xRank</th>
+<th>genome</th>
+<th style="text-align: left;">Size</th>
+<th>numReads numUniqueReads abundance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Bacter</td>
+<td style="text-align: right;">ia</td>
+<td>2 su</td>
+<td>perkin</td>
+<td>gdom</td>
+<td style="text-align: left;">0</td>
+<td>1 0 0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cellul</td>
+<td style="text-align: right;">omonas</td>
+<td>gilvu</td>
+<td>s 11</td>
+<td>specie</td>
+<td style="text-align: left;">s 3526</td>
+<td>441 1 0 0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Phenyl</td>
+<td style="text-align: right;">obacte</td>
+<td>rium</td>
+<td>20</td>
+<td>genus</td>
+<td style="text-align: left;">4379</td>
+<td>231 1 0 0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shewan</td>
+<td style="text-align: right;">ella</td>
+<td>22 ge</td>
+<td>nus</td>
+<td>514001</td>
+<td style="text-align: left;">8 1</td>
+<td>1 0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Myxoco</td>
+<td style="text-align: right;">ccales</td>
+<td>29</td>
+<td>orde</td>
+<td>r 97</td>
+<td style="text-align: left;">44470</td>
+<td>1 0 0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Archan</td>
+<td style="text-align: right;">gium g</td>
+<td>ephyra</td>
+<td>48</td>
+<td>specie</td>
+<td style="text-align: left;">s 1248</td>
+<td>9432 6 4 0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Chondr</td>
+<td style="text-align: right;">omyces</td>
+<td>croca</td>
+<td>tus</td>
+<td>52 sp</td>
+<td style="text-align: left;">ecies</td>
+<td>11388132 4 1 0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sorang</td>
+<td style="text-align: right;">ium ce</td>
+<td>llulos</td>
+<td>um</td>
+<td>56 sp</td>
+<td style="text-align: left;">ecies</td>
+<td>13907952 2 0 0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lysoba</td>
+<td style="text-align: right;">cter</td>
+<td>68 ge</td>
+<td>nus</td>
+<td>0 5</td>
+<td style="text-align: left;">0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="section-8" class="level1">
+<h1></h1>
 <section id="questions" class="level2">
 <h2>Questions?</h2>
 </section>
