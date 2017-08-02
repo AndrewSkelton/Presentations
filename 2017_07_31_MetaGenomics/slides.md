@@ -224,5 +224,39 @@ for(i in variables.in) {
 * Kraken could be too sensitive, so other methods are worth trying
 * QIIME + Phyloseq
 
+
+#
+## Centrifuge
+* Classifier for metagenomic sequences
+* Available on Github / Johns Hopkins Website
+* Well build software, published late 2016
+* Recently compiled (mid-2016) databases of:
+* Bacteria, Archaea (4.4GB)
+* Bacteria, Archaea, Viruses, Human (5.4GB)
+* nt (50GB)
+
+## Code
+```bash
+centrifuge -q --phred64 -p 8 --seed 73 \
+					 -S Flowcell_A_1.centrifuge.out \
+					 -x Index/p+h+v/p+h+v \
+					 -1 data_in/Flowcell_A_1.unmapped.R1_val_1.fq.gz \
+					 -2 data_in/Flowcell_A_1.unmapped.R2_val_2.fq.gz
+```
+
+## Output Table
+name	taxID	taxRank	genomeSize	numReads	numUniqueReads	abundance
+----- ----- ----- ----- ----- ----- -----
+Bacteria	2	superkingdom	0	1	0	0.0
+Cellulomonas gilvus	11	species	3526441	1	0	0.0
+Phenylobacterium	20	genus	4379231	1	0	0.0
+Shewanella	22	genus	5140018	1	1	0.0
+Myxococcales	29	order	9744470	1	0	0.0
+Archangium gephyra	48	species	12489432	6	4	0.0
+Chondromyces crocatus	52	species	11388132	4	1	0.0
+Sorangium cellulosum	56	species	13907952	2	0	0.0
+Lysobacter	68	genus	0	5	0	0.0
+
+
 #
 ## Questions?
