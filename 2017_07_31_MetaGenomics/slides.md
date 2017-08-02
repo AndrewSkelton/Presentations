@@ -245,8 +245,8 @@ centrifuge -q --phred64 -p 8 --seed 73 \
 ```
 
 ## Output Table
-name	taxID	taxRank	genomeSize	numReads	numUniqueReads	abundance
------ ----- ----- ----- ----- ----- -----
+name	              taxID	 taxRank	    genomeSize	 numReads	  numUniqueReads	 abundance
+------------------- ----- ------------ ------------ ---------- ---------------- -----------
 Bacteria	2	superkingdom	0	1	0	0.0
 Cellulomonas gilvus	11	species	3526441	1	0	0.0
 Phenylobacterium	20	genus	4379231	1	0	0.0
