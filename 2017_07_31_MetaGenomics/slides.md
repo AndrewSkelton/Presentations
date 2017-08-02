@@ -30,7 +30,7 @@
 ## Process
 * fastqc on each sample
 * MultiQC for experiment wide context
-* Trimmomatic for cleaning up data
+* Trim Galore for cleaning up data
 
 ## Trimming
 ```bash
